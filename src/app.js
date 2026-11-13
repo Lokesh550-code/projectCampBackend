@@ -20,8 +20,13 @@ app.use(
   }),
 );
 
+// Import routes
+import healthcheckRouter from "./routes/healthcheck.route.js";
+
 app.get("/", (req, res) => {
   res.send("Welcome to base camppy!");
 });
+
+app.use("/api/v1/healthcheck", healthcheckRouter);
 
 export default app;
