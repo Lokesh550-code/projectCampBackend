@@ -14,6 +14,8 @@ const generateAccessAndRefreshTokens = async (userId) => {
     user.refreshToken = refreshToken;
 
     await user.save({ validateBeforeSave: false });
+
+    return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(
       500,
@@ -75,6 +77,55 @@ export const registerUser = asyncHandler(async (req, res, next) => {
         201,
         { user: createdUser },
         "User registered successfully, and verrification email has been sent on your email",
+      ),
+    );
+});
+
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email) {
+    throw new ApiError(400, "Email is required");
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(400, "User does not exists");
+  }
+
+  const isPasswordCorrect = await user.verifyPassword(password);
+
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "Invalid credentials");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    user._id,
+  );
+
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken -isEmailVerified -forgotPasswordToken -forgotPasswordExpiry -emailVerificationToken -emailVerificationExpiry",
+  );
+
+  if (!loggedInUser) {
+    throw new ApiError(500, "Something went wrong while logging in ");
+  }
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser },
+        "User logged in successfully",
       ),
     );
 });
