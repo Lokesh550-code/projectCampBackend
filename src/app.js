@@ -22,11 +22,13 @@ app.use(
 
 // Import routes
 import healthcheckRouter from "./routes/healthcheck.route.js";
+import authRouter from "./routes/auth.route.js";
 
 app.get("/", (req, res) => {
   res.send("Welcome to base camppy!");
 });
 
 app.use("/api/v1/healthcheck", healthcheckRouter);
+app.use("/api/v1/auth", authRouter);
 
 export default app;
