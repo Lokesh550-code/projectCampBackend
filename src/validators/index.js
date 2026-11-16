@@ -27,3 +27,14 @@ export const userRegisterValidator = () => {
       .withMessage(),
   ];
 };
+
+export const userLoginValidator = () => {
+  return [
+    body("email")
+      .trim.notEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Invaid email"),
+    body("password").trim().notEmpty().withMessage("Password is required"),
+  ];
+};
