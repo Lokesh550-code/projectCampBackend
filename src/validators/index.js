@@ -31,7 +31,7 @@ export const userRegisterValidator = () => {
 export const userLoginValidator = () => {
   return [
     body("email")
-      .trim.notEmpty()
+      .trim().notEmpty()
       .withMessage("Email is required")
       .isEmail()
       .withMessage("Invaid email"),
