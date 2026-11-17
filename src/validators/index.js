@@ -31,10 +31,43 @@ export const userRegisterValidator = () => {
 export const userLoginValidator = () => {
   return [
     body("email")
-      .trim().notEmpty()
+      .trim()
+      .notEmpty()
       .withMessage("Email is required")
       .isEmail()
       .withMessage("Invaid email"),
     body("password").trim().notEmpty().withMessage("Password is required"),
+  ];
+};
+
+export const userChangeCurrentPasswordValidator = () => {
+  return [
+    body("oldPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("Old password is required"),
+    bosy("newPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("New password is required"),
+  ];
+};
+
+export const userFrogotPasswordValidator = () => {
+  return [
+    body("email")
+      .trim()
+      .notEmpty("Email is required")
+      .isEmail()
+      .withMessage("Invalid email"),
+  ];
+};
+
+export const userResetForgotPasswordValidator = () => {
+  return [
+    body("newPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("New password is required"),
   ];
 };
