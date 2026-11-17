@@ -3,7 +3,11 @@ import { User } from "../models/user.model.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { sendEmail, emailVerificationMailgenContent } from "../utils/mail.js";
+import {
+  sendEmail,
+  emailVerificationMailgenContent,
+  passwordRecoveryMailgenContent,
+} from "../utils/mail.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -158,10 +162,6 @@ export const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
-// export const getCurrentUser = asyncHandler(async (req, res) => {
-
-// })
-
 export const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
@@ -289,4 +289,41 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   } catch (error) {
     throw new ApiError(401, "Invalid refresh token");
   }
+});
+
+export const forgotPasswordRequest = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const { unHashedToken, hashToken, tokenExpiry } =
+    await user.generateTemporaryToken();
+
+  user.forgotPasswordToken = hashToken;
+  user.forgotPasswordExpiry = tokenExpiry;
+
+  await user.save({ validateBeforeSave: false });
+
+  await sendEmail({
+    email: user?.email,
+    subject: "Password reset request",
+    mailgenContent: passwordRecoveryMailgenContent(
+      user.username,
+      `${req.protocol}://${req.get("host")}/api/v1/users/forgot-password/${unHashedToken}`,
+    ),
+  });
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        {},
+        "Password reset mail has been send to your email",
+      ),
+    );
 });
