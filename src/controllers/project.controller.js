@@ -84,7 +84,17 @@ export const updateProject = asyncHandler(async (req, res) => {
 });
 
 export const deleteProject = asyncHandler(async (req, res) => {
-  // placeholder
+  const { projectId } = req.params;
+
+  const project = await Project.findByIdAndDelete(projectId);
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, project, "Project deleted successfully"));
 });
 
 export const addMembersToProject = asyncHandler(async (req, res) => {
