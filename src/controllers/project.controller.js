@@ -18,8 +18,8 @@ export const getProjectsById = asyncHandler(async (req, res) => {
 export const createProject = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
 
-  if (!name && !description) {
-    throw new ApiError(400, "Title or description are required");
+  if (!name || !description) {
+    throw new ApiError(400, "Title and description are required");
   }
 
   const session = await mongoose.startSession();
@@ -62,7 +62,25 @@ export const createProject = asyncHandler(async (req, res) => {
 });
 
 export const updateProject = asyncHandler(async (req, res) => {
-  // placeholder
+  const { name, description } = req.body;
+
+  if (!name && !description) {
+    throw new ApiError(401, "Name and description are required");
+  }
+
+  const project = Project.create({
+    name,
+    description,
+    createdBy: mongoose.Types.ObjectId(req.user._id),
+  });
+
+  if (!project) {
+    throw new ApiError(500, "Project updation failed");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, project, "Project updated successfully"));
 });
 
 export const deleteProject = asyncHandler(async (req, res) => {
