@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import { User } from "../models/user.model.js";
 import { Project } from "../models/project.model.js";
 import { Task } from "../models/task.model.js";
@@ -17,7 +17,38 @@ export const getTaskById = asyncHandler(async (req, res) => {
 });
 
 export const createTask = asyncHandler(async (req, res) => {
-  // placeholder
+  const { title, description, assignedTo, status } = req.body;
+  const { ProjectId } = req.params;
+
+  const project = await Project.findById(ProjectId);
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const files = req.files || [];
+
+  const attachments = files.map((file) => {
+    return {
+      url: `${process.env.SERVER_URL}/images/${file.originalname}`,
+      mimetype: file.mimetype,
+      size: file.size,
+    };
+  });
+
+  const task = await Task.create({
+    title,
+    description,
+    project: new mongoose.Types.ObjectId(ProjectId),
+    assignedTo: assignedTo
+      ? new mongoose.Types.ObjectId(assignedTo)
+      : undefined,
+    status,
+    assignedBy: new mongoose.Types.ObjectId(req.user._id),
+    attachments,
+  });
+
+  res.status(201).json(new ApiResponse(201, task, "Task created successfully"));
 });
 
 export const updateTask = asyncHandler(async (req, res) => {
