@@ -122,13 +122,14 @@ export const createProject = asyncHandler(async (req, res) => {
 });
 
 export const updateProject = asyncHandler(async (req, res) => {
+  const { projectId } = req.params;
   const { name, description } = req.body;
 
   if (!name && !description) {
     throw new ApiError(401, "Name and description are required");
   }
 
-  const project = Project.create({
+  const project = Project.findByIdAndUpdate(projectId, {
     name,
     description,
     createdBy: mongoose.Types.ObjectId(req.user._id),
