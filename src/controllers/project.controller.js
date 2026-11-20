@@ -8,7 +8,60 @@ import mongoose from "mongoose";
 import { UserRoleEnum } from "../utils/constants.js";
 
 export const getProjects = asyncHandler(async (req, res) => {
-  // placeholder
+  const projects = await ProjectMember.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(req.user._id),
+      },
+    },
+    {
+      $lookup: {
+        from: "projects",
+        localField: "projects",
+        foreignField: "_id",
+        as: "Projects",
+        pipeline: [
+          {
+            $lookup: {
+              from: "projectmembers",
+              localField: "_id",
+              foreignField: "projects",
+              as: "projectmembers",
+            },
+          },
+          {
+            $addFields: {
+              members: {
+                $size: "$projectmembers",
+              },
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: "$projects",
+    },
+    {
+      $project: {
+        project: {
+          _id: 1,
+          name: 1,
+          description: 1,
+          members: 1,
+          createdAt: 1,
+          createdBy: 1,
+        },
+        role: 1,
+        _id: 0,
+      },
+    },
+  ]);
+
+  res.status(
+    200,
+    new ApiResponse(200, projects, "Projects fetched successfully"),
+  );
 });
 
 export const getProjectsById = asyncHandler(async (req, res) => {
