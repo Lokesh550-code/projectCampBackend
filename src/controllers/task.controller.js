@@ -9,7 +9,13 @@ import ApiResponse from "../utils/apiResponse.js";
 import ApiError from "../utils/apiError.js";
 
 export const getTasks = asyncHandler(async (req, res) => {
-  // placeholder
+  const projects = await Project.find({
+    createdBy: new mongoose.Types.ObjectId(req.user._id),
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, projects, "Fetched tasks successfully"));
 });
 
 export const getTaskById = asyncHandler(async (req, res) => {
