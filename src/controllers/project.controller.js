@@ -65,7 +65,14 @@ export const getProjects = asyncHandler(async (req, res) => {
 });
 
 export const getProjectsById = asyncHandler(async (req, res) => {
-  // placeholder
+  const { projectId } = req.params;
+  const project = Project.findById(projectId);
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  res.status(200).json(new ApiResponse(200, "Project fetched successfully"));
 });
 
 export const createProject = asyncHandler(async (req, res) => {
