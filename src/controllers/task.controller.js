@@ -9,17 +9,32 @@ import ApiResponse from "../utils/apiResponse.js";
 import ApiError from "../utils/apiError.js";
 
 export const getTasks = asyncHandler(async (req, res) => {
-  const projects = await Project.find({
-    createdBy: new mongoose.Types.ObjectId(req.user._id),
-  });
+  const { projectId } = req.params;
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  const tasks = Task.find({
+    project: new mongoose.Types.ObjectId(project._id),
+  }).populate("assignedTo", "avatar username fullname");
 
   res
     .status(200)
-    .json(new ApiResponse(200, projects, "Fetched tasks successfully"));
+    .json(new ApiResponse(200, tasks, "Fetched tasks successfully"));
 });
 
 export const getTaskById = asyncHandler(async (req, res) => {
-  // placeholder
+  const { taskId } = req.params;
+
+  const task = Task.findById(taskId);
+
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  res.status(200).json(new ApiResponse(200, task, "Task fetched successfully"));
 });
 
 export const createTask = asyncHandler(async (req, res) => {
