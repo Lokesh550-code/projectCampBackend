@@ -16,7 +16,7 @@ export const getTasks = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Task not found");
   }
 
-  const tasks = Task.find({
+  const tasks = await Task.find({
     project: new mongoose.Types.ObjectId(project._id),
   }).populate("assignedTo", "avatar username fullname");
 
@@ -28,10 +28,10 @@ export const getTasks = asyncHandler(async (req, res) => {
 export const getTaskById = asyncHandler(async (req, res) => {
   const { taskId } = req.params;
 
-  const task = Task.aggregate([
+  const task = await Task.aggregate([
     {
       $match: {
-        _id: new mogoose.Types.ObjectId(taskId),
+        _id: new mongoose.Types.ObjectId(taskId),
       },
     },
     {

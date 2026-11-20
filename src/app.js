@@ -26,6 +26,7 @@ app.use(
 import healthcheckRouter from "./routes/healthcheck.route.js";
 import authRouter from "./routes/auth.route.js";
 import projectRouter from "./routes/project.route.js";
+import errorHandler from "./middlewares/errrorHandler.middleware.js";
 
 app.get("/", (req, res) => {
   res.send("Welcome to base camppy!");
@@ -34,5 +35,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/projects", projectRouter);
+
+app.use(errorHandler);
 
 export default app;

@@ -4,7 +4,7 @@ import ApiError from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const validatePermission = (roles = []) => {
-  asyncHandler(async (req, res, next) => {
+  return asyncHandler(async (req, res, next) => {
     const { projectId } = req.params;
 
     if (!projectId) {
@@ -23,7 +23,7 @@ export const validatePermission = (roles = []) => {
     const givenRole = project?.role;
     req.user.role = givenRole;
 
-    if (roles.includes(givenRole)) {
+    if (!roles.includes(givenRole)) {
       throw new ApiError(403, "Access denied");
     }
     next();

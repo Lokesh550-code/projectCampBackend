@@ -4,12 +4,12 @@ import { AvailableUserRoles, UserRoleEnum } from "../utils/constants.js";
 const projectMemberSchema = new mongoose.Schema(
   {
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "User",
       required: true,
     },
     project: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "Project",
       required: true,
     },

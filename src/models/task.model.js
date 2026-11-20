@@ -14,17 +14,17 @@ const taskSchema = new mongoose.Schema(
       trim: true,
     },
     project: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "Project",
       required: true,
     },
     assignedTo: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "User",
       required: true,
     },
     assignedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "User",
       required: true,
     },
